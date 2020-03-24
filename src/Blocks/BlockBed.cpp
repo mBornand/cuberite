@@ -53,17 +53,34 @@ void cBlockBedHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterf
 bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Coords);
+	auto PillowDirection = MetaDataToDirection(Meta & 0x03);
+	auto OffsetCoords = Coords + PillowDirection;
+	
+	if ((Meta & 0x08) != 0)
+	{
+		OffsetCoords = Coords - PillowDirection;
+	}
+
 	if (a_WorldInterface.GetDimension() != dimOverworld)
 	{
 		a_WorldInterface.DoExplosionAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
 	}
-	else if (!((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)))  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
+	else if (
+		!(((a_WorldInterface.GetTimeOfDay() > 12541) && (a_WorldInterface.GetTimeOfDay() < 23458)) ||
+		(a_Player.GetWorld()->GetWeather() == wThunderstorm))
+	)  // Source: https://minecraft.gamepedia.com/Bed#Sleeping
 	{
-		a_Player.SendMessageFailure("You can only sleep at night");
+		a_Player.SendAboveActionBarMessage("You can only sleep at night and during thunderstorms");
+
+		if ((a_Player.GetLastBedPos() != Coords) && (a_Player.GetLastBedPos() != OffsetCoords))
+		{
+			a_Player.SetBedPos(Coords);
+			a_Player.SendMessageSuccess("Home position set successfully");
+		}
 	}
 	else
 	{
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Coords);
 		if ((Meta & 0x4) == 0x4)
 		{
 			a_Player.SendMessageFailure("This bed is occupied");
@@ -80,12 +97,10 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 			if (!a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(a_Player.GetPosition() - Vector3i(0, 5, 0), 8, 10), FindMobs))
 			{
-				a_Player.SendMessageFailure("You may not rest now, there are monsters nearby");
+				a_Player.SendAboveActionBarMessage("You may not rest now, there are monsters nearby");
 			}
 			else
 			{
-				Vector3i PillowDirection(0, 0, 0);
-
 				if ((Meta & 0x8) == 0x8)
 				{
 					// Is pillow
@@ -96,17 +111,20 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					// Is foot end
 					VERIFY((Meta & 0x4) != 0x4);  // Occupied flag should never be set, else our compilator (intended) is broken
 
-					PillowDirection = MetaDataToDirection(Meta & 0x3);
 					if (a_ChunkInterface.GetBlock(Coords + PillowDirection) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
 						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(a_Player, Vector3i{a_BlockX, a_BlockY, a_BlockZ} + PillowDirection);
 					}
 				}
 
-				a_Player.SetBedPos(Coords);
 				SetBedOccupationState(a_ChunkInterface, a_Player.GetLastBedPos(), true);
 				a_Player.SetIsInBed(true);
-				a_Player.SendMessageSuccess("Home position set successfully");
+
+				if ((a_Player.GetLastBedPos() != Coords) && (a_Player.GetLastBedPos() != OffsetCoords))
+				{
+					a_Player.SetBedPos(Coords);
+					a_Player.SendMessageSuccess("Home position set successfully");
+				}
 
 				auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
 				{
@@ -127,6 +145,12 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 						}
 					);
 					a_WorldInterface.SetTimeOfDay(0);
+
+					if (a_Player.GetWorld()->GetWeather() == wThunderstorm)
+					{
+						a_Player.GetWorld()->SetWeather(wSunny);
+					}
+					
 					a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 				}
 			}
