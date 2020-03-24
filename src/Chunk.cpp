@@ -434,6 +434,9 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 				auto idx = a_Area.MakeIndex(AreaX, AreaY, AreaZ);
 				BLOCKTYPE BlockType = AreaBlockTypes[idx];
 				NIBBLETYPE BlockMeta = AreaBlockMetas[idx];
+
+				cChunkInterface ChunkInterface(m_World->GetChunkMap());
+				BlockHandler(BlockType)->OnBroken(ChunkInterface, *m_World, Vector3i(ChunkX, ChunkY, ChunkZ), BlockType, BlockMeta);
 				FastSetBlock(ChunkX, ChunkY, ChunkZ, BlockType, BlockMeta);
 			}  // for x
 		}  // for z
