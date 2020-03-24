@@ -56,7 +56,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(Coords);
 	auto PillowDirection = MetaDataToDirection(Meta & 0x03);
 	auto OffsetCoords = Coords + PillowDirection;
-	
+
 	if ((Meta & 0x08) != 0)
 	{
 		OffsetCoords = Coords - PillowDirection;
@@ -150,7 +150,7 @@ bool cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					{
 						a_Player.GetWorld()->SetWeather(wSunny);
 					}
-					
+
 					a_ChunkInterface.SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 				}
 			}
