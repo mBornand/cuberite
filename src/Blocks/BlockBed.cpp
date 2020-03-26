@@ -164,11 +164,7 @@ void cBlockBedHandler::SleepInBed(cChunkInterface & a_ChunkInterface, cWorldInte
 
 	auto TimeFastForwardTester = [](cPlayer & a_OtherPlayer)
 	{
-		if (!a_OtherPlayer.IsInBed())
-		{
-			return true;
-		}
-		return false;
+		return !a_OtherPlayer.IsInBed();
 	};
 
 	if (a_WorldInterface.ForEachPlayer(TimeFastForwardTester))
