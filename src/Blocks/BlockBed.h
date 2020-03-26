@@ -36,6 +36,8 @@ public:
 	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override;
 	virtual void OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
+	virtual void TrySleeping(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, Vector3i a_Coords, Vector3i a_OffsetCoords, NIBBLETYPE a_Meta, Vector3i a_PillowDirection);
+	virtual void SleepInBed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, Vector3i a_Coords, Vector3i a_OffsetCoords, NIBBLETYPE a_Meta, Vector3i a_PillowDirection);
 
 
 
