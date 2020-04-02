@@ -166,14 +166,8 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	{
 		// IPv6 socket created, switch it into "dualstack" mode:
 		UInt32 Zero = 0;
-		#ifdef _WIN32
-			// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
-			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-			err = EVUTIL_SOCKET_ERROR();
-			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
-		#else
-			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-		#endif
+		int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
+		NeedsTwoSockets = (res == -1);
 
 		// Allow the port to be reused right after the socket closes:
 		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
