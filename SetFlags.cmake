@@ -302,7 +302,7 @@ macro(set_exe_flags)
 				endif()
 			endif()
 			add_flags_cxx("-Wno-error=unused-command-line-argument")
-			add_flags_cxx("-Wno-documentation-unknown-command")
+			add_flags_cxx("-Wno-documentation-unknown-command -Wno-signed-enum-bitfield -Wno-shadow")
 		endif()
 	endif()
 

@@ -116,29 +116,6 @@ int cManualBindings::tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Er
 
 
 
-int cManualBindings::lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList)
-{
-	// Retrieve current function name
-	lua_Debug entry;
-	VERIFY(lua_getstack(L, 0, &entry));
-	VERIFY(lua_getinfo(L, "n", &entry));
-
-	// Insert function name into error msg
-	AString msg(a_pFormat);
-	ReplaceString(msg, "#funcname#", (entry.name != nullptr) ? entry.name : "?");
-
-	// Copied from luaL_error and modified
-	luaL_where(L, 1);
-	AString FmtMsg = Printf(msg.c_str(), a_ArgList);
-	lua_pushlstring(L, FmtMsg.data(), FmtMsg.size());
-	lua_concat(L, 2);
-	return lua_error(L);
-}
-
-
-
-
-
 // Lua bound functions with special return types
 static int tolua_Clamp(lua_State * tolua_S)
 {

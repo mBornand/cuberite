@@ -692,16 +692,6 @@ AString cFile::GetExecutableExt(void)
 
 
 
-int cFile::Printf(const char * a_Fmt, fmt::ArgList a_ArgList)
-{
-	AString buf = ::Printf(a_Fmt, a_ArgList);
-	return Write(buf.c_str(), buf.length());
-}
-
-
-
-
-
 void cFile::Flush(void)
 {
 	fflush(m_File);

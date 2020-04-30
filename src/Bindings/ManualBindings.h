@@ -51,8 +51,26 @@ public:
 	// Helper functions:
 	static cPluginLua * GetLuaPlugin(lua_State * L);
 	static int tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError);
-	static int lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList);
-	FMT_VARIADIC(static int, lua_do_error, lua_State *, const char *)
+
+	template <typename... Args>
+	static int lua_do_error(lua_State * L, const char * a_pFormat, const Args & ... a_ArgList)
+	{
+		// Retrieve current function name
+		lua_Debug entry;
+		VERIFY(lua_getstack(L, 0, &entry));
+		VERIFY(lua_getinfo(L, "n", &entry));
+
+		// Insert function name into error msg
+		AString msg(a_pFormat);
+		ReplaceString(msg, "#funcname#", (entry.name != nullptr) ? entry.name : "?");
+
+		// Copied from luaL_error and modified
+		luaL_where(L, 1);
+		AString FmtMsg = Printf(msg.c_str(), a_ArgList...);
+		lua_pushlstring(L, FmtMsg.data(), FmtMsg.size());
+		lua_concat(L, 2);
+		return lua_error(L);
+	}
 
 
 	/** Binds the DoWith(ItemName) functions of regular classes. */

@@ -384,22 +384,6 @@ public:
 		z = -z;
 	}
 
-	// tolua_end
-
-	/** Allows formatting a Vector<T> using the same format specifiers as for T
-	e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
-	template <typename ArgFormatter>
-	friend void format_arg(fmt::BasicFormatter<char, ArgFormatter> & a_Formatter, const char *& a_FormatStr, Vector3 a_Vec)
-	{
-		std::array<T, 3> Data{{a_Vec.x, a_Vec.y, a_Vec.z}};
-
-		a_Formatter.writer() << '{';
-		fmt::format_arg(a_Formatter, a_FormatStr, fmt::join(Data.cbegin(), Data.cend(), ", "));
-		a_Formatter.writer() << '}';
-	}
-
-	// tolua_begin
-
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;
 
@@ -407,6 +391,49 @@ public:
 	static const double NO_INTERSECTION;
 };
 // tolua_end
+
+
+
+
+
+template <typename What>
+struct fmt::formatter<Vector3<What>>
+{
+	// Parses format specifications of the form ['f' | 'e'].
+	constexpr auto parse(format_parse_context& ctx) {
+		// [ctx.begin(), ctx.end()) is a character range that contains a part of
+		// the format string starting from the format specifications to be parsed,
+		// e.g. in
+		//
+		//   fmt::format("{:f} - point of interest", point{1, 2});
+		//
+		// the range will contain "f} - point of interest". The formatter should
+		// parse specifiers until '}' or the end of the range. In this example
+		// the formatter should parse the 'f' specifier and return an iterator
+		// pointing to '}'.
+
+		// Parse the presentation format and store it in the formatter:
+		auto it = ctx.begin(), end = ctx.end();
+		if (it != end && (*it == 'f')) it++;
+
+		// Check if reached the end of the range:
+		if (it != end && *it != '}')
+			throw format_error("invalid format");
+
+		// Return an iterator past the end of the parsed range:
+		return it;
+	}
+
+	template <typename FormatContext>
+	auto format(const Vector3<What> & a_Vec, FormatContext & a_Formatter)
+	{
+		return format_to(
+			a_Formatter.out(),
+			"{{:.1f}, {:.1f}, {:.1f}}",
+			a_Vec.x, a_Vec.y, a_Vec.z
+		);
+	}
+};
 
 
 

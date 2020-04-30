@@ -63,24 +63,6 @@ void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
 
 
 
-void cLogger::LogPrintf(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
-{
-	LogSimple(Printf(a_Format, a_ArgList), a_LogLevel);
-}
-
-
-
-
-
-void cLogger::LogFormat(const char * a_Format, eLogLevel a_LogLevel, fmt::ArgList a_ArgList)
-{
-	LogSimple(fmt::format(a_Format, a_ArgList), a_LogLevel);
-}
-
-
-
-
-
 cLogger::cAttachment cLogger::AttachListener(std::unique_ptr<cListener> a_Listener)
 {
 	auto nonOwning = a_Listener.get();
@@ -116,74 +98,6 @@ void cLogger::DetachListener(cListener * a_Listener)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Global functions
-
-void FLOG(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogFormat(a_Format, cLogger::llRegular, a_ArgList);
-}
-
-
-
-
-
-void FLOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llInfo, a_ArgList);
-}
-
-
-
-
-
-void FLOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llWarning, a_ArgList);
-}
-
-
-
-
-
-void FLOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogFormat( a_Format, cLogger::llError, a_ArgList);
-}
-
-
-
-
-
-void LOG(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llRegular, a_ArgList);
-}
-
-
-
-
-
-void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llInfo, a_ArgList);
-}
-
-
-
-
-
-void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llWarning, a_ArgList);
-}
-
-
-
-
-
-void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList)
-{
-	cLogger::GetInstance().LogPrintf( a_Format, cLogger::llError, a_ArgList);
-}
 
 
 

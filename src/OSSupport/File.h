@@ -163,8 +163,12 @@ public:
 	/** Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there). */
 	static AStringVector GetFolderContents(const AString & a_Folder);  // Exported in ManualBindings.cpp
 
-	int Printf(const char * a_Fmt, fmt::ArgList);
-	FMT_VARIADIC(int, Printf, const char *)
+	template <typename... Args>
+	int Printf(const char * a_Fmt, const Args & ... a_ArgList)
+	{
+		AString buf = ::Printf(a_Fmt, a_ArgList...);
+		return Write(buf.c_str(), buf.length());
+	}
 
 	/** Flushes all the bufferef output into the file (only when writing) */
 	void Flush(void);

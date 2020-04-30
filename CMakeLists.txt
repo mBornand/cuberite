@@ -93,32 +93,10 @@ else()
 	set(BUILD_DATETIME "approx: ${BUILD_DATETIME}")
 endif()
 
-# We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
-# Adapted from https://web.archive.org/web/https://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
-if(MSVC OR MSVC_IDE)
-	if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
-		message(FATAL_ERROR "The project requires C++11 features. "
-			"You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
-			"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
-	elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
-		message( "VC11: using Microsoft Visual Studio 2012 "
-			"with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
-		set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
-	else() # VC12+, assuming C++11 supported.
-	endif()
-else()  # GCC or Clang, so get compiler version directly since CMAKE_CXX_COMPILER_VERSION is only available in CMake 2.8.8 and later
-	execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE DUMPED_COMPILER_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-	# Check for gcc version 4.8 or greater
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND DUMPED_COMPILER_VERSION VERSION_LESS "4.8")
-		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 4.8 is needed")
-	endif()
-
-	# Check for clang version 3.4 or greater
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND DUMPED_COMPILER_VERSION VERSION_LESS "3.4")
-		message(FATAL_ERROR "You have ${CMAKE_CXX_COMPILER_ID} version ${DUMPED_COMPILER_VERSION}, but at least 3.4 is needed")
-	endif()
-endif()
+# We need C++17 features
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(BUILD_TOOLS OFF CACHE BOOL "")
 set(SELF_TEST OFF CACHE BOOL "")
@@ -188,7 +166,7 @@ set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis t
 set(SQLITECPP_RUN_DOXYGEN     OFF CACHE BOOL "Run Doxygen C++ documentation tool."             FORCE)
 set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                                 FORCE)
 set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
-set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
+set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
 set(SQLITE_ENABLE_COLUMN_METADATA OFF CACHE BOOL "" FORCE)
 
 # Set options for LibEvent, disable all their tests and benchmarks:
@@ -255,7 +233,7 @@ add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/ EXCLUDE_FROM_ALL)
-add_subdirectory(lib/sqlite/)
+add_subdirectory(lsqlite/)
 add_subdirectory(lib/SQLiteCpp/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
@@ -264,13 +242,13 @@ add_subdirectory(lib/fmt)
 
 
 # Add proper include directories so that SQLiteCpp can find SQLite3:
-get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
-set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
-set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
-set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
+#get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
+#set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
+#set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
+#set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
 
 # Add proper includes for LibEvent's event-config.h header:
-include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
+include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS} lib/SQLiteCpp/include)
 
 # Prettify jsoncpp_lib_static name in VS solution explorer
 set_property(TARGET jsoncpp_lib_static PROPERTY PROJECT_LABEL "jsoncpp")

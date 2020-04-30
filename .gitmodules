@@ -9,15 +9,15 @@
 	url = https://github.com/cuberite/ChatLog.git
 [submodule "lib/mbedtls"]
 	path = lib/mbedtls
-	url = https://github.com/cuberite/polarssl.git
+	url = https://github.com/ARMmbed/mbedtls.git
 	ignore = dirty
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
-	url = https://github.com/cuberite/SQLiteCpp.git
+	url = https://github.com/SRombauts/SQLiteCpp.git
 	ignore = dirty
 [submodule "lib/libevent"]
 	path = lib/libevent
-	url = https://github.com/cuberite/libevent.git
+	url = https://github.com/libevent/libevent.git
 	ignore = dirty
 [submodule "lib/jsoncpp"]
 	path = lib/jsoncpp
@@ -25,7 +25,7 @@
 	ignore = dirty
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
-	url = https://github.com/cuberite/TCLAP.git
+	url = https://github.com/mirror/tclap.git
 	ignore = dirty
 [submodule "lib/cmake-coverage"]
 	path = lib/cmake-coverage

@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "fmt/printf.h"
+
 
 
 typedef std::string AString;
@@ -23,13 +25,22 @@ typedef std::map<AString, AString> AStringMap;
 
 /** Output the formatted text into the string.
 Returns a_Dst. */
-extern AString & Printf(AString & a_Dst, const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString &, Printf, AString &, const char *)
+template <typename... Args>
+extern AString & Printf(AString & a_Dst, const char * format, const Args & ... args)
+{
+	//ASSERT(format != nullptr);
+	a_Dst = "";//fmt::sprintf(format, args...);
+	return a_Dst;
+}
 
 /** Output the formatted text into string
 Returns the formatted string by value. */
-extern AString Printf(const char * format, fmt::ArgList args);
-FMT_VARIADIC(AString, Printf, const char *)
+template <typename... Args>
+extern AString Printf(const char * format, const Args & ... args)
+{
+	//ASSERT(format != nullptr);
+	return "";//fmt::sprintf(format, args...);
+}
 
 /** Add the formated string to the existing data in the string.
 Returns a_Dst. */

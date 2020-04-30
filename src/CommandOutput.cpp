@@ -11,20 +11,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cCommandOutputCallback:
-
-void cCommandOutputCallback::Out(const char * a_Fmt, fmt::ArgList args)
-{
-	AString Output = Printf(a_Fmt, args);
-	Output.append("\n");
-	Out(Output);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cStringAccumCommandOutputCallback:
 
 void cStringAccumCommandOutputCallback::Out(const AString & a_Text)

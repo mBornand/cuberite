@@ -1,25 +1,24 @@
 language: cpp
 cache: ccache
 
-dist: bionic
-osx_image: xcode11.3
+matrix:
+  include:
 
-compiler:
-- gcc
-- clang
+  - name: "Leenucks"
+    compiler:
+    - gcc
+    - clang
+    dist: bionic
+    os: linux
 
-os:
-- linux
-- osx
-- windows
+  - name: "Macinsquash"
+    os: osx
+    osx_image: xcode11.3
 
-arch:
-- amd64
-- ppc64le
-- s390x
-- arm64
+  - name: "Windoze"
+    os: windows
 
 script:
 - cmake -E make_directory Build/
 - cmake -E chdir Build/ cmake ..
-- cmake -E chdir Build/ cmake --build .
+- cmake -E chdir Build/ cmake --build . --parallel 2

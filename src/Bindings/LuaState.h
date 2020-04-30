@@ -37,6 +37,7 @@ extern "C"
 
 
 #include <functional>
+#include <string_view>
 
 #include "../Defines.h"
 #include "../FunctionRef.h"
@@ -838,7 +839,7 @@ public:
 	/** Prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
 	To be used for bindings when they detect bad parameters.
 	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
-	int ApiParamError(fmt::StringRef a_Msg);
+	int ApiParamError(std::string_view a_Msg);
 
 	/** Formats and prints the message using printf-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.
 	To be used for bindings when they detect bad parameters.

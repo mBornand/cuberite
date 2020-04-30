@@ -52,27 +52,6 @@ static unsigned char HexToDec(char a_HexChar)
 
 
 
-AString & Printf(AString & str, const char * format, fmt::ArgList args)
-{
-	ASSERT(format != nullptr);
-	str = fmt::sprintf(format, args);
-	return str;
-}
-
-
-
-
-
-AString Printf(const char * format, fmt::ArgList args)
-{
-	ASSERT(format != nullptr);
-	return fmt::sprintf(format, args);
-}
-
-
-
-
-
 AStringVector StringSplit(const AString & str, const AString & delim)
 {
 	AStringVector results;
@@ -630,36 +609,36 @@ format binary data this way:
 */
 AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine)
 {
-	fmt::MemoryWriter Output;
-	/* If formatting the data from the comment above:
-		Hex holds:   "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66 "
-		Chars holds: "1234567890abcdef" */
-	fmt::MemoryWriter Hex, Chars;
+	//fmt::MemoryWriter Output;
+	///* If formatting the data from the comment above:
+	//	Hex holds:   "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66 "
+	//	Chars holds: "1234567890abcdef" */
+	//fmt::MemoryWriter Hex, Chars;
 
-	if (a_Size > 0)
-	{
-		// Same as std::ceil(static_cast<float>(a_Size) / a_BytesPerLine);
-		const size_t NumLines = a_Size / a_BytesPerLine + (a_Size % a_BytesPerLine != 0);
-		const size_t CharsPerLine = 14 + 4 * a_BytesPerLine;
-		Output.buffer().reserve(NumLines * CharsPerLine);
-	}
+	//if (a_Size > 0)
+	//{
+	//	// Same as std::ceil(static_cast<float>(a_Size) / a_BytesPerLine);
+	//	const size_t NumLines = a_Size / a_BytesPerLine + (a_Size % a_BytesPerLine != 0);
+	//	const size_t CharsPerLine = 14 + 4 * a_BytesPerLine;
+	//	Output.buffer().reserve(NumLines * CharsPerLine);
+	//}
 
-	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
-	{
-		size_t k = std::min(a_Size - i, a_BytesPerLine);
-		for (size_t j = 0; j < k; j++)
-		{
-			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
-			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
-			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
-		}  // for j
+	//for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
+	//{
+	//	size_t k = std::min(a_Size - i, a_BytesPerLine);
+	//	for (size_t j = 0; j < k; j++)
+	//	{
+	//		Byte c = (static_cast<const Byte *>(a_Data))[i + j];
+	//		Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
+	//		Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
+	//	}  // for j
 
-		// Write Hex with a dynamic fixed width
-		Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
-		Hex.clear();
-		Chars.clear();
-	}  // for i
-	a_Out.append(Output.data(), Output.size());
+	//	// Write Hex with a dynamic fixed width
+	//	Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
+	//	Hex.clear();
+	//	Chars.clear();
+	//}  // for i
+	//a_Out.append(Output.data(), Output.size());
 	return a_Out;
 }
 

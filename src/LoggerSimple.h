@@ -2,33 +2,59 @@
 // Logging free functions defined in Logger.cpp
 #pragma once
 
+#include "Logger.h"
+
 // python style format specified logging
 
-extern void FLOG(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOG, const char *)
+template <typename... Args>
+extern void FLOG(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogFormat(a_Format, cLogger::llRegular, a_ArgList...);
+}
 
-extern void FLOGINFO(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGINFO, const char *)
+template <typename... Args>
+extern void FLOGINFO(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogFormat(a_Format, cLogger::llInfo, a_ArgList...);
+}
 
-extern void FLOGWARNING(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGWARNING, const char *)
+template <typename... Args>
+extern void FLOGWARNING(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogFormat(a_Format, cLogger::llWarning, a_ArgList...);
+}
 
-extern void FLOGERROR(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, FLOGERROR, const char *)
+template <typename... Args>
+extern void FLOGERROR(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogFormat(a_Format, cLogger::llError, a_ArgList...);
+}
 
 // printf style format specified logging (DEPRECATED)
 
-extern void LOG(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOG, const char *)
+template <typename... Args>
+extern void LOG(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llRegular, a_ArgList...);
+}
 
-extern void LOGINFO(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGINFO, const char *)
+template <typename... Args>
+extern void LOGINFO(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llInfo, a_ArgList...);
+}
 
-extern void LOGWARNING(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGWARNING, const char *)
+template <typename... Args>
+extern void LOGWARNING(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llWarning, a_ArgList...);
+}
 
-extern void LOGERROR(const char * a_Format, fmt::ArgList a_ArgList);
-FMT_VARIADIC(void, LOGERROR, const char *)
+template <typename... Args>
+extern void LOGERROR(const char * a_Format, const Args & ... a_ArgList)
+{
+	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llError, a_ArgList...);
+}
 
 
 // Macro variants
