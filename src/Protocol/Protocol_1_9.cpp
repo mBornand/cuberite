@@ -170,33 +170,38 @@ void cProtocol_1_9_0::SendEntityMetadata(const cEntity & a_Entity)
 
 
 
-void cProtocol_1_9_0::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktEntityRelMove);
+	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32 * 128;
+
+	// Limitations of a short
+	static const auto Max = std::numeric_limits<Int16>::max();
+
+	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	{
+		// Difference within limitations, use a relative move packet
+		if (true)
+		{
+			cPacketizer Pkt(*this, pktEntityRelMoveLook);
+			WriteEntityRelMoveLook(Pkt, a_Entity, Vector3<Int16>(Delta));
+		}
+		else
+		{
+			cPacketizer Pkt(*this, pktEntityRelMove);
+			WriteEntityRelMove(Pkt, a_Entity, Vector3<Int16>(Delta));
+		}
+
+		return;
+	}
+
+	// Too big a movement, do a teleport
+	cPacketizer Pkt(*this, pktTeleportEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
-	Pkt.WriteBEInt16(a_RelX * 128);
-	Pkt.WriteBEInt16(a_RelY * 128);
-	Pkt.WriteBEInt16(a_RelZ * 128);
-	Pkt.WriteBool(a_Entity.IsOnGround());
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktEntityRelMoveLook);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	// TODO: 1.9 changed these from chars to shorts, meaning that there can be more percision and data.  Other code needs to be updated for that.
-	Pkt.WriteBEInt16(a_RelX * 128);
-	Pkt.WriteBEInt16(a_RelY * 128);
-	Pkt.WriteBEInt16(a_RelZ * 128);
+	Pkt.WriteBEDouble(a_Entity.GetPosX());
+	Pkt.WriteBEDouble(a_Entity.GetPosY());
+	Pkt.WriteBEDouble(a_Entity.GetPosZ());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
@@ -415,7 +420,7 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Vector3d LastSentPos = a_Player.GetLastSentPos();
+	Vector3d LastSentPos = a_Player.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteBEDouble(LastSentPos.z);
@@ -457,7 +462,7 @@ void cProtocol_1_9_0::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_FallingBlock.GetUniqueID());
 	Pkt.WriteBEUInt8(70);  // Falling block
-	Vector3d LastSentPos = a_FallingBlock.GetLastSentPos();
+	Vector3d LastSentPos = a_FallingBlock.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
 	Pkt.WriteBEDouble(LastSentPos.z);
@@ -483,7 +488,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Mob.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<Byte>(GetProtocolMobType(a_Mob.GetMobType())));
-	Vector3d LastSentPos = a_Mob.GetLastSentPos();
+	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
 	Pkt.WriteBEDouble(LastSentPos.z);
@@ -543,7 +548,7 @@ void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Vehicle
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Vehicle.GetUniqueID());
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_VehicleType));
-	Vector3d LastSentPos = a_Vehicle.GetLastSentPos();
+	Vector3d LastSentPos = a_Vehicle.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y);
 	Pkt.WriteBEDouble(LastSentPos.z);
@@ -553,24 +558,6 @@ void cProtocol_1_9_0::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Vehicle
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Vehicle.GetSpeedZ() * 400));
-}
-
-
-
-
-
-void cProtocol_1_9_0::SendTeleportEntity(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEDouble(a_Entity.GetPosX());
-	Pkt.WriteBEDouble(a_Entity.GetPosY());
-	Pkt.WriteBEDouble(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -1909,6 +1896,38 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			break;
 		}
 	}
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteEntityRelMove(cPacketizer & a_Pkt, const cEntity & a_Entity, const Vector3<Int16> a_Delta)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	a_Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	a_Pkt.WriteBEInt16(a_Delta.x);
+	a_Pkt.WriteBEInt16(a_Delta.y);
+	a_Pkt.WriteBEInt16(a_Delta.z);
+	a_Pkt.WriteBool(a_Entity.IsOnGround());
+}
+
+
+
+
+
+void cProtocol_1_9_0::WriteEntityRelMoveLook(cPacketizer & a_Pkt, const cEntity & a_Entity, const Vector3<Int16> a_Delta)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	a_Pkt.WriteVarInt32(a_Entity.GetUniqueID());
+	a_Pkt.WriteBEInt16(a_Delta.x);
+	a_Pkt.WriteBEInt16(a_Delta.y);
+	a_Pkt.WriteBEInt16(a_Delta.z);
+	a_Pkt.WriteByteAngle(a_Entity.GetYaw());
+	a_Pkt.WriteByteAngle(a_Entity.GetPitch());
+	a_Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 

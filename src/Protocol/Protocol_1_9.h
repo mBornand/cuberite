@@ -46,8 +46,7 @@ public:
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
-	virtual void SendEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
-	virtual void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
+	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
 	virtual void SendEntityStatus               (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
@@ -63,7 +62,6 @@ public:
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData) override;
 	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
-	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
@@ -120,6 +118,9 @@ protected:
 
 	/** Writes the metadata for the specified entity, not including the terminating 0xff. */
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
+
+	void WriteEntityRelMove(cPacketizer & a_Pkt, const cEntity & a_Entity, const Vector3<Int16> a_Delta);
+	void WriteEntityRelMoveLook(cPacketizer & a_Pkt, const cEntity & a_Entity, const Vector3<Int16> a_Delta);
 
 	/** Writes the mob-specific metadata for the specified mob */
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
