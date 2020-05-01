@@ -847,7 +847,7 @@ public:
 	template <typename... Args>
 	int ApiParamError(const char * a_MsgFormat, const Args & ... a_Args)
 	{
-		return ApiParamError(Printf(a_MsgFormat, a_Args...));
+		return ApiParamError("");//Printf(a_MsgFormat, a_Args...));
 	}
 
 	/** Formats and prints the message using python-style format specifiers, but prefixed with the current function name, then logs the stack contents and raises a Lua error.

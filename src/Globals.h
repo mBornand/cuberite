@@ -8,6 +8,14 @@
 
 
 
+// Friar Tuck: oh Robin Hood, if we are to be removed, we shall be removed together!
+// TODO: remove here and in src/CMakeLists
+#pragma once
+
+
+
+
+
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
 	// Disable some warnings that we don't care about:

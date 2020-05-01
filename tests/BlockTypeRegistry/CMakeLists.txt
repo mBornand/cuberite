@@ -1,13 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-
 include_directories(${CMAKE_SOURCE_DIR}/src/)
-
-add_definitions(-DTEST_GLOBALS=1)
-
-
-
-
 
 # Define individual test executables:
 

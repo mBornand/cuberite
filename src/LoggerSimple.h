@@ -41,13 +41,13 @@ extern void LOG(const char * a_Format, const Args & ... a_ArgList)
 template <typename... Args>
 extern void LOGINFO(const char * a_Format, const Args & ... a_ArgList)
 {
-	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llInfo, a_ArgList...);
+	//cLogger::GetInstance().LogPrintf(a_Format, cLogger::llInfo, a_ArgList...);
 }
 
 template <typename... Args>
 extern void LOGWARNING(const char * a_Format, const Args & ... a_ArgList)
 {
-	cLogger::GetInstance().LogPrintf(a_Format, cLogger::llWarning, a_ArgList...);
+	//cLogger::GetInstance().LogPrintf(a_Format, cLogger::llWarning, a_ArgList...);
 }
 
 template <typename... Args>

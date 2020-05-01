@@ -399,29 +399,14 @@ public:
 template <typename What>
 struct fmt::formatter<Vector3<What>>
 {
-	// Parses format specifications of the form ['f' | 'e'].
-	constexpr auto parse(format_parse_context& ctx) {
-		// [ctx.begin(), ctx.end()) is a character range that contains a part of
-		// the format string starting from the format specifications to be parsed,
-		// e.g. in
-		//
-		//   fmt::format("{:f} - point of interest", point{1, 2});
-		//
-		// the range will contain "f} - point of interest". The formatter should
-		// parse specifiers until '}' or the end of the range. In this example
-		// the formatter should parse the 'f' specifier and return an iterator
-		// pointing to '}'.
-
-		// Parse the presentation format and store it in the formatter:
-		auto it = ctx.begin(), end = ctx.end();
-		if (it != end && (*it == 'f')) it++;
-
-		// Check if reached the end of the range:
-		if (it != end && *it != '}')
-			throw format_error("invalid format");
-
-		// Return an iterator past the end of the parsed range:
-		return it;
+	constexpr auto parse(format_parse_context & a_Context)
+	{
+		auto Iterator = a_Context.begin();
+		while (*Iterator != '}')
+		{
+			Iterator++;
+		}
+		return Iterator;
 	}
 
 	template <typename FormatContext>
@@ -429,8 +414,7 @@ struct fmt::formatter<Vector3<What>>
 	{
 		return format_to(
 			a_Formatter.out(),
-			"{{:.1f}, {:.1f}, {:.1f}}",
-			a_Vec.x, a_Vec.y, a_Vec.z
+			"TODO"
 		);
 	}
 };

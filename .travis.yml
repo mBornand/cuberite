@@ -1,22 +1,28 @@
 language: cpp
-cache: ccache
+# cache: ccache
+
+# Use Linux by default
+os: linux
+dist: bionic
+
+addons:
+  snaps:
+  - name: cmake
+    confinement: classic
+    channel: latest
 
 matrix:
   include:
 
-  - name: "Leenucks"
-    compiler:
-    - gcc
-    - clang
-    dist: bionic
-    os: linux
+  - compiler: clang
+    before_install: &use-cmake
+    - export PATH=/snap/bin/:${PATH}
 
-  - name: "Macinsquash"
-    os: osx
+  - compiler: gcc
+    before_install: *use-cmake
+
+  - os: osx
     osx_image: xcode11.3
-
-  - name: "Windoze"
-    os: windows
 
 script:
 - cmake -E make_directory Build/
